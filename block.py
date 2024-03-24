@@ -12,7 +12,7 @@ class Block():
         if len(Block.values)==0:
             Block.values=values
             for name in Block.values:
-                Block.pictures.append(pygame.image.load(name + ".png")) 
+                Block.pictures.append(pygame.image.load( "/Img/" + name + ".png")) 
                 
         
         self.current=self.pictures[values.index("hidden")]
