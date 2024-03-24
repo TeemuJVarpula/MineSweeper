@@ -1,5 +1,8 @@
 # MineSweeper
 Minesweeper game with python
+
+!! Currently game is under modifications and not ready yet !!
+
 "
 Unopened tiles (cover the board at the start of the game, can also be made by removing flags)
 Numbered tiles (can show 1-8)
@@ -14,32 +17,3 @@ A player selects a cell to open it. If a player opens a cell containing a mine, 
 Beginner is usually on an 8x8 or 9x9 board containing 10 mines, 
 Intermediate is usually on a 16x16 board with 40 mines and 
 expert is usually on a 30x16 board with 99 mines
-
-Game construction:
-    Field
-        choose difficulty
-        generate mines to field
-        
-
-    game loop
-        show screen
-        get button
-            if left "open specific field"
-                if bomb -> game over
-                if near bomb -> show amount near mines
-                if empty -> reveal empty and next near bombs
-            if right "mark as bomb" or "unmark bomb"
-        check result
-            if bombs still unfound
-                bombs unmarked/hidden -> continue
-            if too many bombs marked, some empty still hidden and unmarked --> continue
-            if all bombs found and marked ( or all other fields "open" ) --> game ends with victory
-
-        draw screen
-
-        
-        
-
-         
-
-        
