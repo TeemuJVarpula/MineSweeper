@@ -1,8 +1,10 @@
 import pygame
+import os
 
 class Block():
     pictures=[]
     values=[]
+    DATA_PATH = os.path.join(('img'))
     
     def __init__(self,values,x:int,y:int,coord_x:int,coord_y:int):
         pygame.sprite.Sprite.__init__(self)
@@ -12,7 +14,7 @@ class Block():
         if len(Block.values)==0:
             Block.values=values
             for name in Block.values:
-                Block.pictures.append(pygame.image.load( "/Img/" + name + ".png")) 
+                Block.pictures.append(pygame.image.load( os.path.join( Block.DATA_PATH ,name + ".png")))
                 
         
         self.current=self.pictures[values.index("hidden")]
