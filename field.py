@@ -2,20 +2,16 @@ import random
 from datetime import datetime
 from block import Block
 
+values=["empty", "1","2","3","4","5","6","7","8","mine","flag","hidden"]
 class Field ():
-    values=[]
     checkedTiles=[]
         
-    def __init__(self,values:list,difficulty:tuple):
-        self.values=values
+    def __init__(self,difficulty:tuple):
         self.difficulty=difficulty
         self.fieldtable=[]
         self.mines=[]
         self.mines_left=difficulty[0]
         
-        if len(Field.values)==0:
-            Field.values=values
-            
         self.preparefield()
         
     def preparefield(self):
@@ -48,7 +44,7 @@ class Field ():
                 self.fieldtable.append([])
             
             for x in range(0,self.difficulty[1]):
-                temp_block=Block(self.values,x,y,place_x+x*30, 50+place_y+y*30)
+                temp_block=Block(values,x,y,place_x+x*30, 50+place_y+y*30)
                      
                 if (x,y) in self.mines:
                     temp_block.markMine()
@@ -59,7 +55,7 @@ class Field ():
         for y in range (0,self.difficulty[2]):
             for x in range (0,self.difficulty[1]):
                 #if current tile is not a mine
-                if self.fieldtable[y][x].tile!=self.values.index("mine"):
+                if self.fieldtable[y][x].tile!=values.index("mine"):
                     #Check neighbours
                     self.fieldtable[y][x].neighbours=self.checkNeighbours((x,y))
                     
@@ -119,14 +115,46 @@ class Field ():
         if len(sortedneighbours)>0:
             for neighbour in sortedneighbours:
                 temp_tile=self.fieldtable[neighbour[1]][neighbour[0]]
-                if temp_tile.tile == Field.values.index("empty") and temp_tile.current == temp_tile.pictures[Field.values.index("hidden")]:
+                if temp_tile.tile == values.index("empty") and temp_tile.current == temp_tile.pictures[values.index("hidden")]:
                         temp_tile.openTile()
                         Field.checkedTiles.append((temp_tile.index_x,temp_tile.index_y))
                         self.openTiles(neighbour)
-                elif temp_tile.tile != Field.values.index("mine") and temp_tile.tile != Field.values.index("hidden") and temp_tile.current == temp_tile.pictures[Field.values.index("hidden")]:
+                elif temp_tile.tile != values.index("mine") and temp_tile.tile != values.index("hidden") and temp_tile.current == temp_tile.pictures[values.index("hidden")]:
                         temp_tile.openTile()
                         Field.checkedTiles.append((temp_tile.index_x,temp_tile.index_y))
-       
+                        
+    def revealTiles(self,value:tuple):
+        
+        neighbourslist=self.checkNeighbours((value[0],value[1]))
+        
+        current_block=self.fieldtable[value[1]][value[0]]
+        bombs=0
+        
+        for neighbour in neighbourslist:
+            neighbour_block=self.fieldtable[neighbour[1]][neighbour[0]]
+            
+            if neighbour_block.current==values.index("flag"):
+                bombs+=1
+        
+        if current_block.tile <= bombs:
+            sortedneighbours=[neighbour for neighbour in neighbourslist if (neighbour[0],neighbour[1]) not in Field.checkedTiles] 
+        
+            if len(sortedneighbours)>0:
+                for neighbour in sortedneighbours:
+                    temp_tile=self.fieldtable[neighbour[1]][neighbour[0]]
+                    if temp_tile.tile == values.index("empty") and temp_tile.current == temp_tile.pictures[values.index("hidden")]:
+                            temp_tile.openTile()
+                            Field.checkedTiles.append((temp_tile.index_x,temp_tile.index_y))
+                            self.openTiles(neighbour)
+                    elif temp_tile.tile != values.index("mine") and temp_tile.tile != values.index("hidden") and temp_tile.current == temp_tile.pictures[values.index("hidden")]:
+                            temp_tile.openTile()
+                            Field.checkedTiles.append((temp_tile.index_x,temp_tile.index_y))
+         
+                
+        
+        return True                
+                        
+                           
     def handleclick(self,type=str,x=int,y=int):
         cur_block=self.fieldtable[y][x]
 
@@ -149,13 +177,9 @@ class Field ():
                 self.mines_left+=1
             return True
         elif type== "Both":
-            if cur_block.tile != Field.values.index("empty"):
-                if cur_block.markFlag()==True:
-                    print("pöö")
-                else:
-                    print("puu")
-            return True
-    
+            if cur_block.tile < 9:
+                return self.revealTiles((cur_block.index_x,cur_block.index_y))
+                
     def checkTilesForEnd(self):
         for y in self.fieldtable:
             for x in y:

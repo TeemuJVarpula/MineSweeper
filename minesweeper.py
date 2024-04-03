@@ -3,11 +3,14 @@ import pygame.freetype
 import pygame.sprite
 from datetime import datetime
 from field import Field
+import os 
 
-beginner,intermediate,expert = (10,9,9),(40,16,16),(99,30,16)
-values=["empty", "1","2","3","4","5","6","7","8","mine","flag","hidden"]
-            
+beginner,intermediate,expert = (10,9,9,270,270),(40,16,16,480,480),(99,30,16,900,480)
+Smiley_values=["Smiley_happy","Smiley_unhappy"]
+DATA_PATH = os.path.join(('img'))
+
 class MinesweeperBoard():
+    smileys=[]
         
     def __init__(self):
         pygame.init()
@@ -15,11 +18,17 @@ class MinesweeperBoard():
 
         self.game_font = pygame.font.SysFont("Comic Sans MS", 24)
         self.game_freefont = pygame.freetype.SysFont("Comic Sans MS", 24)
+        
+        if len(MinesweeperBoard.smileys)==0:
+            for value in Smiley_values:
+                MinesweeperBoard.smileys.append(pygame.image.load( os.path.join( DATA_PATH ,value + ".png")))
 
+        
         self.init_2(beginner)
             
     def init_2(self,difficulty):
         self.difficulty=difficulty
+        self.smiley=MinesweeperBoard.smileys[0]
         self.game_screen = pygame.display.set_mode((difficulty[1]*30+10, 80+difficulty[2]*30+10))
         self.game_screen.fill((224,224,224))
 
@@ -30,7 +39,7 @@ class MinesweeperBoard():
         self.game_clock = datetime.now()
         self.clock_start = datetime.now()
         
-        self.field= Field(values,self.difficulty)
+        self.field= Field(self.difficulty)
 
         self.gameLoop()
         
@@ -55,6 +64,7 @@ class MinesweeperBoard():
                     mouse_position = pygame.mouse.get_pos()
                     buttons_pressed=pygame.mouse.get_pressed()
                     
+                    
                     # Check if game size if modified
                     if mouse_position:
                         if self.beginner_text_area.collidepoint(mouse_position)==True:
@@ -63,7 +73,9 @@ class MinesweeperBoard():
                             self.init_2(intermediate)
                         elif self.expert_text_area.collidepoint(mouse_position)==True:
                             self.init_2(expert)
-                                  
+                        elif self.face_area.collidepoint(mouse_position)==True:
+                            self.init_2(self.difficulty)
+                            
                     #if game area is clicked
                     if game_on == True or ((game_on == False) and (end=="Tie")):
                         
@@ -88,6 +100,7 @@ class MinesweeperBoard():
                         #check clicks and game state
                         if game_on==False:
                             end="Lose"
+                            self.smiley=MinesweeperBoard.smileys[1]
                             print("clicks")
                             break
                         
@@ -115,16 +128,17 @@ class MinesweeperBoard():
         self.game_freefont.render_to(self.game_screen,(95,10),"Intermediate" ,(0,0,0),size=15)
         self.expert_text_area=pygame.draw.rect(self.game_screen, (199,199,199), (210, 5, 60, 20)) 
         self.game_freefont.render_to(self.game_screen,(215,10),"Expert" ,(0,0,0),size=15)
-        
+        self.face_area=pygame.draw.rect(self.game_screen, (199,199,199), ((self.difficulty[3]/2)-25, 30, 50, 50)) 
+        self.game_screen.blit(self.smiley, ((self.difficulty[3]/2)-25, 30))
         
         pygame.draw.rect(self.game_screen, (199,199,199), (10, 32, 60, 45))  
         self.game_freefont.render_to(self.game_screen,(20,40),f"{self.field.mines_left}" ,(255,0,0),size=40)
         
-        pygame.draw.rect(self.game_screen, (199,199,199), (((self.difficulty[1]*30-80), 32, 80, 45)) )
+        pygame.draw.rect(self.game_screen, (199,199,199), (self.difficulty[3]-80, 32, 80, 45) )
         if self.game_clock != 0:
-            self.game_freefont.render_to(self.game_screen,((self.difficulty[1]*30-75),40),f"{(self.game_clock-self.clock_start).seconds:03d}" ,(255,0,0),(139,130,109), 0, 0,40)
+            self.game_freefont.render_to(self.game_screen,(self.difficulty[3]-75,40),f"{(self.game_clock-self.clock_start).seconds:03d}" ,(255,0,0),(139,130,109), 0, 0,40)
         else:
-            self.game_freefont.render_to(self.game_screen,((self.difficulty[1]*30-75),40),"000" ,(255,0,0),(139,130,109), 0, 0,40)
+            self.game_freefont.render_to(self.game_screen,(self.difficulty[3]-75,40),"000" ,(255,0,0),(139,130,109), 0, 0,40)
         
         for y in self.field.fieldtable:
             for x in y:
