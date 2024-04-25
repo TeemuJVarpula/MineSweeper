@@ -112,11 +112,12 @@ class MinesweeperBoard():
             
             #draw screen
             self.drawscreen() 
-        
-        if end=="Win":
-            print("Onneksi olkeoon löysit pommit")
-        else:
-            print("peli loppui pommin räjähdykseen")
+            if game_on==False:
+                if end=="Win":
+                    print("Onneksi olkeoon löysit pommit")
+                elif end=="Lose":
+                    print("peli loppui pommin räjähdykseen")
+            
 
     #draw actual game screen
     def drawscreen(self):
